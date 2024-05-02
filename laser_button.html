@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laser Button</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            display: grid;
+            place-items: center;
+            height: 100dvh;
+            width: 100%;
+        }
+
+        button {
+            padding: 1rem 2rem;
+            font-size: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <button>Laser</button>
+
+    <script>
+        const btn = document.querySelector('button')
+
+        // create context
+        let audioContext = new AudioContext()
+
+        function laserate() {
+            // create oscillator
+            let osc = audioContext.createOscillator()
+
+            // set oscillator type - can be ['sine', 'square', 'sawtooth', 'triangle', 'custom']
+            osc.type = 'triangle'
+
+            // set frequency
+            osc.frequency.value = 880
+
+            // up frequency over a second
+            osc.frequency.exponentialRampToValueAtTime(350, audioContext.currentTime + 1)
+
+
+            let gain = audioContext.createGain()
+            gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.9)
+
+
+            // start oscilator
+            osc.start()
+            // stop it after a second
+            osc.stop(audioContext.currentTime + 1)
+            // connect input node to output node
+            osc.connect(gain).connect(audioContext.destination)
+            // by default the destination is our speakers
+        }
+
+
+        btn.addEventListener('click', () => {
+            // state will be suspended by default, resume on click
+            if (audioContext.state === 'suspended') {
+                audioContext.resume()
+            }
+            laserate()
+        })
+    </script>
+</body>
+</html>
